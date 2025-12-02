@@ -26,6 +26,5 @@ export class CreateUserDto {
   @IsNumber()
   age: number;
 
-  @IsStrongPassword()
   password: string;
 }
