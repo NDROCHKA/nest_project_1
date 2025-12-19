@@ -17,16 +17,10 @@ export class UserController {
 
   @ApiCreateUser()
   @Post('register')
-  create(@Body() userDto: CreateUserDto): CreateUserDto {
+  create(@Body() userDto: CreateUserDto): any {
     return this.userService.create(userDto);
   }
 
-
   @Get(':id')
-  getOne(){
-
-  }
-  
+  getOne() {}
 }
-
-
