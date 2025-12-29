@@ -3,14 +3,13 @@ import {
   IsEmail,
   IsNumber,
   IsString,
-  IsStrongPassword,
   MaxLength,
   MinLength,
 } from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty({
-    description: 'User name \n, age\n , email\n , password',
+    description: 'User name ',
     example: 'jon bouzed',
     minLength: 2,
     maxLength: 50,
@@ -20,11 +19,15 @@ export class CreateUserDto {
   @MaxLength(50)
   name: string;
 
+  @ApiProperty({
+    description: 'email',
+    example: 'anaGay@123',
+    minLength: 2,
+    maxLength: 50,
+  })
   @IsEmail()
   email: string;
 
   @IsNumber()
   age: number;
-
-  password: string;
 }
