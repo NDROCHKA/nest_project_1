@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { UserModel } from './user/user.modul';
+import { UserModul } from './user/user.modul';
 import { ConfigModule } from '@nestjs/config';
 import Joi from 'joi';
 import { DatabaseModule } from './database/database.module.postgre';
@@ -15,7 +15,7 @@ import { DatabaseModule } from './database/database.module.postgre';
       // }),
     }),
     DatabaseModule,
-    UserModel,
+    UserModul,
   ],
   controllers: [],
   providers: [],

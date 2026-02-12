@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: 'user' })
+@Entity({ name: 'User' })
 export class User {
   @ApiProperty({
     description: 'User ID',
@@ -22,7 +22,7 @@ export class User {
   name: string;
 
   @ApiProperty({ description: 'User email', example: 'john@example.com' })
-  @Index('IDX_USERS_EMAIL')
+  // @Index('IDX_USERS_EMAIL')
   @Column({ type: 'varchar', length: 320, unique: true   })
   email: string;
 

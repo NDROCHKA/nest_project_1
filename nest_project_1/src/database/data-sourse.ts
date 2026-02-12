@@ -1,50 +1,46 @@
 import 'reflect-metadata';
-import { config as loadEnv } from 'dotenv';
 import { DataSource, DataSourceOptions } from 'typeorm';
-import { join } from 'path';
 
-loadEnv();
+const prefix = process.env.NODE_ENV === 'test' ? 'TEST_' : '';
 
-const nodeEnv = process.env.NODE_ENV ?? 'development';
-const prefix = nodeEnv === 'test' ? 'TEST_' : '';
-const url = process.env[`${prefix}DATABASE_URL`];
-
-const dataSourceOptions: DataSourceOptions = {
-  type: (process.env[`${prefix}DATABASE_TYPE`] ?? 'postgres') as any,
-  ...(url
-    ? { url }
-    : {
-        host: process.env[`${prefix}DATABASE_HOST`],
-        port: parseInt(process.env[`${prefix}DATABASE_PORT`] ?? '5432', 10),
-        username: process.env[`${prefix}DATABASE_USERNAME`],
-        password: process.env[`${prefix}DATABASE_PASSWORD`],
-        database: process.env[`${prefix}DATABASE_NAME`],
-      }),
-  synchronize:
-    (process.env[`${prefix}DATABASE_SYNCHRONIZE`] ?? 'false') === 'true',
-  logging: nodeEnv !== 'production',
-  entities: [join(__dirname, '/../**/*.entity{.ts,.js}')],
-  migrations: [join(__dirname, '/migrations/**/*{.ts,.js}')],
+export const AppDataSource = new DataSource({
+  type: process.env[`${prefix}DATABASE_TYPE`] as any,
+  url: process.env[`${prefix}DATABASE_URL`],
+  host: process.env[`${prefix}DATABASE_HOST`],
+  port: process.env[`${prefix}DATABASE_PORT`]
+    ? parseInt(process.env[`${prefix}DATABASE_PORT`]!, 10)
+    : 5432,
+  username: process.env[`${prefix}DATABASE_USERNAME`],
+  password: process.env[`${prefix}DATABASE_PASSWORD`],
+  database: process.env[`${prefix}DATABASE_NAME`],
+  synchronize: process.env[`${prefix}DATABASE_SYNCHRONIZE`] === 'true',
+  dropSchema: false,
+  keepConnectionAlive: true,
+  logging: process.env.NODE_ENV !== 'production',
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+  migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
+  cli: {
+    entitiesDir: 'src',
+    subscribersDir: 'subscriber',
+  },
   extra: {
-    max: parseInt(
-      process.env[`${prefix}DATABASE_MAX_CONNECTIONS`] ?? '100',
-      10,
-    ),
+    max: process.env[`${prefix}DATABASE_MAX_CONNECTIONS`]
+      ? parseInt(process.env[`${prefix}DATABASE_MAX_CONNECTIONS`]!, 10)
+      : 100,
+    connectionTimeoutMillis: 30000, // 30 seconds
+    idleTimeoutMillis: 30000, // 30 seconds
+    query_timeout: 60000, // 60 seconds
+    statement_timeout: 60000, // 60 seconds
+    idle_in_transaction_session_timeout: 30000, // 30 seconds for ALL environments
     ssl:
-      (process.env[`${prefix}DATABASE_SSL_ENABLED`] ?? 'false') === 'true'
+      process.env[`${prefix}DATABASE_SSL_ENABLED`] === 'true'
         ? {
             rejectUnauthorized:
-              (process.env[`${prefix}DATABASE_REJECT_UNAUTHORIZED`] ??
-                'false') === 'true',
+              process.env[`${prefix}DATABASE_REJECT_UNAUTHORIZED`] === 'true',
             ca: process.env[`${prefix}DATABASE_CA`],
             key: process.env[`${prefix}DATABASE_KEY`],
             cert: process.env[`${prefix}DATABASE_CERT`],
           }
         : undefined,
   },
-};
-
-const AppDataSource = new DataSource(dataSourceOptions);
-
-export default AppDataSource;
-export { AppDataSource, dataSourceOptions };
+} as DataSourceOptions);

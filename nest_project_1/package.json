@@ -6,6 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "typeorm": "env-cmd -- ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "migration:generate": "npm run typeorm -- --dataSource=src/database/data-source.ts migration:generate src/database/migrations/init",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -32,7 +34,7 @@
     "joi": "^18.0.2",
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1",
+    "rxjs": "^7.8.2",
     "swagger-ui-express": "^5.0.1",
     "typeorm": "^0.3.28"
   },

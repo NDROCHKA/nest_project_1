@@ -26,12 +26,15 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @Get(":id")
+  @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.userService.findOne(id);
   }
-  @Patch(":id")
-  async update(@Param('id' , ParseIntPipe) id: number , @Body()updateUserDto:updateUserDto): Promise<User>{
-  return this.userService.update(id , updateUserDto);
+  @Patch(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateUserDto: updateUserDto,
+  ): Promise<User> {
+    return this.userService.update(id, updateUserDto);
   }
 }
