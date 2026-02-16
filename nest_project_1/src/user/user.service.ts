@@ -26,52 +26,61 @@ export class UserService {
     createUserDto: CreateUserDto,
     queryRunner?: QueryRunner,
   ): Promise<User> {
-    let isCreatedQueryRunner = false;
+    // let isCreatedQueryRunner = false;
 
-    if (!queryRunner) {
-      queryRunner = this.dataSource.createQueryRunner();
-      await queryRunner.connect();
-      await queryRunner.startTransaction();
-      isCreatedQueryRunner = true;
-    }
-    try {
-      const repository = await this.getRepository(queryRunner);
+    // if (!queryRunner) {
+    //   queryRunner = this.dataSource.createQueryRunner();
+    //   await queryRunner.connect();
+    //   await queryRunner.startTransaction();
+    //   isCreatedQueryRunner = true;
+    // }
+    // try {
+    const repository = await this.getRepository(queryRunner);
 
-      const existing = await repository.findOne({
-        where: { email: createUserDto.email },
+    const existing = await repository.findOne({
+      where: { email: createUserDto.email },
+    });
+    if (existing) {
+      throw new UserEmailAlreadyExistsException({
+        user: createUserDto.email,
       });
-      if (existing) {
-        throw new UserEmailAlreadyExistsException({
-          user: createUserDto.email,
-        });
-      }
-      const entity = this.userRepository.create(createUserDto);
-      const newUser = this.userRepository.save(entity);
-      if (isCreatedQueryRunner) {
-        await queryRunner.commitTransaction();
-      }
-
-      return newUser;
-    } catch (error) {
-      if (isCreatedQueryRunner) {
-        queryRunner.rollbackTransaction();
-      }
-      throw error;
     }
+    const entity = this.userRepository.create(createUserDto);
+    const newUser = this.userRepository.save(entity);
+    // if (isCreatedQueryRunner) {
+    //   await queryRunner.commitTransaction();
+    //   await queryRunner.release();
+    // }
+
+    return newUser;
+    // } catch (error) {
+    //   if (isCreatedQueryRunner) {
+    //     queryRunner.rollbackTransaction();
+    //   }
+    //   throw error;
+    // }
   }
 
-  async findOne(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
+  async findOne(id: number, queryRunner?: QueryRunner): Promise<User> {
+    const repository = await this.getRepository(queryRunner);
+
+    const user = await repository.findOne({ where: { id } });
 
     if (!user) throw new UserNotFoundException({ user: id });
     return user;
   }
 
-  async update(id: number, updateUserDto: updateUserDto): Promise<User> {
+  async update(
+    id: number,
+    updateUserDto: updateUserDto,
+    queryRunner?: QueryRunner,
+  ): Promise<User> {
+    const repository = await this.getRepository(queryRunner);
+
     const user = await this.findOne(id);
 
     if (updateUserDto.email) {
-      const existing = await this.userRepository.findOne({ where: { id } });
+      const existing = await repository.findOne({ where: { id } });
 
       if (existing && existing.id !== id) {
         throw new UserNotFoundException({ user: id });
